@@ -3,7 +3,7 @@ Connecting Google Sheet into godot with READ and WRITE access
 
 # YouTube Video Tutorial
 
-LINK WILL BE ADDED SOON
+[![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/0.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
 
 # Appsheet code
 ~~~
