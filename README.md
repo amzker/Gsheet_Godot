@@ -3,8 +3,7 @@ Connecting Google Sheet into godot with READ and WRITE access
 
 # YouTube Video Tutorial
 
-[![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/0.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
-
+[![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/hqdefault.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
 # Appscript code
 ~~~
 function json(sheetName) {
