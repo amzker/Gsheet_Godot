@@ -72,7 +72,8 @@ function doPost(params) {
 # READING DATA FROM SHEET [GET]
 
 ```
-#geturl = Your appscirpt url + ?sheetname=YourSheetname
+#geturl = Your appscirpt web app url + ?sheetname=YourSheetname
+#apiurl = Your appscript web app url 
 var apiurl = "https://script.google.com/macros/s/AKfycbwNyfgHW1uRnNiw-8_8jrkPzKqffpDtHROVRsAQl2cD451qHlFq_kiyFQ8h3zil0y8EJg/exec"
 var geturl = apiurl+"?sheetname="+sheetname
 
