@@ -68,3 +68,34 @@ function doPost(params) {
   
 }
 ~~~
+
+# READING DATA FROM SHEET [GET]
+
+```
+#geturl = Your appscirpt url + ?sheetname=YourSheetname
+var apiurl = "https://script.google.com/macros/s/AKfycbwNyfgHW1uRnNiw-8_8jrkPzKqffpDtHROVRsAQl2cD451qHlFq_kiyFQ8h3zil0y8EJg/exec"
+var geturl = apiurl+"?sheetname="+sheetname
+
+func getdata():
+  $HTTPRequest.request(geturl)
+
+func _on_HTTPRequest_request_completed(result, response_code, headers, body):
+			var data = body.get_string_from_utf8()
+			data = data.replace("[","").replace("]","")
+			data = parse_json(data)
+			#print(data)
+			print(data["TOTAL_CASH_IN_HAND"]) # you can access data based on key name 
+		else:
+			print(response_code)
+			$Label.text = "Trying again response code: "+str(response_code)
+			getdata()
+
+```
+
+# SENDING DATA/WRITING DATA TO SHEET [POST]
+```
+var datasend = "?date="+date+"&time="+time+"&cate="+cate+"&amount="+amount+"&desc="+desc #LOOK into appsheet code's doPost func to understand this 
+var headers = ["Content-Length: 0"]
+var posturl = apiurl+datasend
+$HTTPRequest.request(posturl,headers,true,HTTPClient.METHOD_POST)
+```
