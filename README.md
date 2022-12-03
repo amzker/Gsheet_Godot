@@ -5,7 +5,7 @@ Connecting Google Sheet into godot with READ and WRITE access
 
 [![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/0.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
 
-# Appsheet code
+# Appscript code
 ~~~
 function json(sheetName) {
   const spreadsheet = SpreadsheetApp.openById("1h_KlXz9IWt2MtQQWYUSk4FJbIr02MbfXWU3ZRqY7U3I") //CHANGE WITH YOUR SHEET ID ( see url of you sheet d/)
