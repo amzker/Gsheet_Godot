@@ -74,8 +74,10 @@ function doPost(params) {
 ```
 #geturl = Your appscirpt web app url + ?sheetname=YourSheetname
 #apiurl = Your appscript web app url 
+#replace get and api url with your urls, this is just example urls 
+var getsheetname = "RESULTS" # sheet name from where you want to get data 
 var apiurl = "https://script.google.com/macros/s/AKfycbwNyfgHW1uRnNiw-8_8jrkPzKqffpDtHROVRsAQl2cD451qHlFq_kiyFQ8h3zil0y8EJg/exec"
-var geturl = apiurl+"?sheetname="+sheetname
+var geturl = apiurl+"?sheetname="+getsheetname
 
 func getdata():
   $HTTPRequest.request(geturl)
@@ -90,7 +92,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 
 # SENDING DATA/WRITING DATA TO SHEET [POST]
 ```
-var sheetname = DATA # name of sheet in which you want to add data
+var sheetname = "DATA" # name of sheet in which you want to add data
 #this is just example variables
 #date, time, cate, amount, desc = 12/11/22,08:15,INCOME,250,SOAP
 var datasend = "?date="+date+"&time="+time+"&cate="+cate+"&amount="+amount+"&desc="+desc+"&sheetname="+sheetname #LOOK into appsheet code's doPost func to understand this 
