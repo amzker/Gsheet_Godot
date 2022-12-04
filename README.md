@@ -94,7 +94,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 var sheetname = "DATA" # name of sheet in which you want to add data
 #this is just example variables
 #date, time, cate, amount, desc = 12/11/22,08:15,INCOME,250,SOAP
-var datasend = "?date="+date+"&time="+time+"&cate="+cate+"&amount="+amount+"&desc="+desc+"&sheetname="+sheetname #LOOK into appsheet code's doPost func to understand this 
+var datasend = "?date="+date+"&time="+time+"&cate="+cate+"&amount="+amount+"&desc="+desc+"&sheetname="+sheetname #LOOK into appscript's code doPost func to understand this 
 var headers = ["Content-Length: 0"]
 var posturl = apiurl+datasend
 $HTTPRequest.request(posturl,headers,true,HTTPClient.METHOD_POST)
