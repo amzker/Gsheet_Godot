@@ -5,7 +5,7 @@ Connecting Google Sheet into godot with READ and WRITE access
 
 [![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/hqdefault.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
 # Appscript code
-~~~
+```javascript
 function json(sheetName) {
   const spreadsheet = SpreadsheetApp.openById("1h_KlXz9IWt2MtQQWYUSk4FJbIr02MbfXWU3ZRqY7U3I") //CHANGE WITH YOUR SHEET ID ( see url of you sheet d/)
   const sheet = spreadsheet.getSheetByName(sheetName)
@@ -66,11 +66,11 @@ function doPost(params) {
 */
   
 }
-~~~
+```
 
 # READING DATA FROM SHEET [GET]
 
-```
+```gdscript
 #geturl = Your appscirpt web app url + ?sheetname=YourSheetname
 #apiurl = Your appscript web app url 
 #replace get and api url with your urls, this is just example urls 
@@ -90,7 +90,7 @@ func _on_HTTPRequest_request_completed(result, response_code, headers, body):
 ```
 
 # SENDING DATA/WRITING DATA TO SHEET [POST]
-```
+```gdscript
 var sheetname = "DATA" # name of sheet in which you want to add data
 #this is just example variables
 #date, time, cate, amount, desc = 12/11/22,08:15,INCOME,250,SOAP
