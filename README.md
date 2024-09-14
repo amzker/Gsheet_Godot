@@ -1,101 +1,176 @@
 # Gsheet_Godot
 Connecting Google Sheet into godot with READ and WRITE access
 
-# YouTube Video Tutorial
 
+# YouTube Video Tutorial
+## Those who came from youtube video select branch v1
 [![VIDEO](https://img.youtube.com/vi/jeg0boRWdxM/hqdefault.jpg)](https://www.youtube.com/watch?v=jeg0boRWdxM)
 # Appscript code
 ```javascript
-function json(sheetName) {
-  const spreadsheet = SpreadsheetApp.openById("1h_KlXz9IWt2MtQQWYUSk4FJbIr02MbfXWU3ZRqY7U3I") //CHANGE WITH YOUR SHEET ID ( see url of you sheet d/)
-  const sheet = spreadsheet.getSheetByName(sheetName)
-  const data = sheet.getDataRange().getValues()
-  const jsonData = convertToJson(data)
-  return ContentService
-        .createTextOutput(JSON.stringify(jsonData))
-        .setMimeType(ContentService.MimeType.JSON)
-}
-function convertToJson(data) {
-  const headers = data[0]
-  const raw_data = data.slice(1,)
-  let json = []
-  raw_data.forEach(d => {
-      let object = {}
-      for (let i = 0; i < headers.length; i++) {
-        object[headers[i]] = d[i]
-      }
-      json.push(object)
-  });
-  return json
-}
-function doGet(params) {
-  const sheetname = params.parameter.sheetname
-  return json(sheetname)
+function doGet(e) {
+  var action = e.parameter.action;
+  
+  switch (action) {
+	case 'fetch_notes_list':
+	  return fetchNotesList();
+	case 'fetch_notes_content':
+	  return fetchNotesContent(e.parameter.id);
+	default:
+	  return ContentService.createTextOutput("Invalid action");
+  }
 }
 
-function doPost(params) {
-  const datee = params.parameter.date
-  const timee = params.parameter.time
-  const catee = params.parameter.cate
-  const amounte = params.parameter.amount
-  const desce = params.parameter.desc
-  const sheetname = params.parameter.sheetname
-
+function doPost(e) {
+  var action = e.parameter.action;
   
-  if(typeof params !== 'undefined')
-  Logger.log(params.parameter);
-
-  var ss  = SpreadsheetApp.openById("1h_KlXz9IWt2MtQQWYUSk4FJbIr02MbfXWU3ZRqY7U3I") //CHANGE WITH YOUR SHEET ID ( see url of you sheet d/)
-  var sheet = ss.getSheetByName(sheetname)
-  var Rowtoenter = sheet.getLastRow()+1
-  sheet.appendRow([datee,timee,catee,amounte,desce])
-  
-
-/* 
-  var datecol = sheet.getRange(Rowtoenter,1)
-  var timecol = sheet.getRange(Rowtoenter,2)
-  var catecol = sheet.getRange(Rowtoenter,3)
-  var amountcol = sheet.getRange(Rowtoenter,4)
-  var descol = sheet.getRange(Rowtoenter,5)
-  
-  datecol.setValue(datee)
-  timecol.setValue(timee)
-  catecol.setValue(catee)
-  amountcol.setValue(amounte)
-  descol.setValue(desce)
-*/
-  
+  switch (action) {
+	case 'create_new_note':
+	  return createNewNote(e.postData.contents);
+	case 'save_existing_note':
+	  return saveExistingNote(e.postData.contents);
+	case 'delete_note':
+	  return deleteNote(e.postData.contents);
+	default:
+	  return ContentService.createTextOutput("Invalid action");
+  }
 }
+
+function createNewNote(data) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var jsonData = JSON.parse(data);
+  var id = getNextId(sheet); 
+  var title = jsonData.title;
+  var text = jsonData.text;
+  
+  if (!title || !text) {
+	return ContentService.createTextOutput("Title and text are required");
+  }
+
+  sheet.appendRow([id, title, text]);
+  return ContentService.createTextOutput("New note created with ID: " + id);
+}
+
+function saveExistingNote(data) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var jsonData = JSON.parse(data);
+  var id = parseInt(jsonData.id, 10);
+  var title = jsonData.title;
+  var text = jsonData.text;
+  
+  if (!id || !title || !text) {
+	return ContentService.createTextOutput("ID, title, and text are required");
+  }
+						 // getRange(rowno , columnno)
+  var range = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3);
+  var values = range.getValues();
+  
+  for (var i = 0; i < values.length; i++) {
+	if (values[i][0] === id) {
+	  sheet.getRange(i + 2, 2).setValue(title);  // Update title
+	  sheet.getRange(i + 2, 3).setValue(text);   // Update text
+	  return ContentService.createTextOutput("Note with ID " + id + " updated.");
+	}
+  }
+  return ContentService.createTextOutput("Note with ID " + id + " not found.");
+}
+
+function fetchNotesList() {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var range = sheet.getRange(2, 1, sheet.getLastRow() - 1, 2);  // Get ID and Title columns
+  var values = range.getValues();
+  var notesList = [];
+  
+  for (var i = 0; i < values.length; i++) {
+	notesList.push({ id: values[i][0], title: values[i][1] });
+  }
+  
+  return ContentService.createTextOutput(JSON.stringify(notesList))
+	.setMimeType(ContentService.MimeType.JSON);
+}
+
+function fetchNotesContent(id) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var noteId = parseInt(id, 10);
+  
+  if (!noteId) {
+	return ContentService.createTextOutput("ID is required");
+  }
+  
+  var range = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3);
+  var values = range.getValues();
+  
+  for (var i = 0; i < values.length; i++) {
+	if (values[i][0] === noteId) {
+	  var note = { id: values[i][0], title: values[i][1], text: values[i][2] };
+	  return ContentService.createTextOutput(JSON.stringify(note))
+		.setMimeType(ContentService.MimeType.JSON);
+	}
+  }
+  return ContentService.createTextOutput("Note with ID " + noteId + " not found.");
+}
+
+function deleteNote(data) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+  var jsonData = JSON.parse(data);
+  var id = parseInt(jsonData.id, 10);
+  
+  if (!id) {
+	return ContentService.createTextOutput("ID is required");
+  }
+  
+  var range = sheet.getRange(2, 1, sheet.getLastRow() - 1, 3);
+  var values = range.getValues();
+  
+  for (var i = 0; i < values.length; i++) {
+	if (values[i][0] === id) {
+	  sheet.deleteRow(i + 2);  // Delete the row with the matching ID
+	  return ContentService.createTextOutput("Note with ID " + id + " deleted.");
+	}
+  }
+  return ContentService.createTextOutput("Note with ID " + id + " not found.");
+}
+
+function getNextId(sheet) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow === 1) return 1;  // No data yet
+  
+  var lastId = sheet.getRange(lastRow, 1).getValue();
+  return lastId + 1;
+}
+
 ```
 
 # READING DATA FROM SHEET [GET]
 
 ```gdscript
-#geturl = Your appscirpt web app url + ?sheetname=YourSheetname
-#apiurl = Your appscript web app url 
-#replace get and api url with your urls, this is just example urls 
-var getsheetname = "RESULTS" # sheet name from where you want to get data 
-var apiurl = "https://script.google.com/macros/s/AKfycbwNyfgHW1uRnNiw-8_8jrkPzKqffpDtHROVRsAQl2cD451qHlFq_kiyFQ8h3zil0y8EJg/exec"
-var geturl = apiurl+"?sheetname="+getsheetname
+func make_http_get_request(endpoint: String, params: Dictionary = {}) -> void:
+	var url = app_url + "?action=" + endpoint
+	for key in params.keys():
+		url += "&" + key + "=" + str(params[key])
 
-func getdata():
-  $HTTPRequest.request(geturl)
-
-func _on_HTTPRequest_request_completed(result, response_code, headers, body):
-			var data = body.get_string_from_utf8()
-			data = data.replace("[","").replace("]","")
-			data = parse_json(data)
-			#print(data)
-			print(data["TOTAL_CASH_IN_HAND"]) # you can access data based on key name 
+	var request = HTTPRequest.new()
+	add_child(request)
+	request.connect("request_completed", _on_request_completed)
+	request.request(url)
+	
+	
+func _on_request_completed(result, response_code, headers, body) -> void:
+	if response_code == 200:
+		
+		var res = body.get_string_from_utf8()
+		var json_result = JSON.parse_string(res)
 ```
 
 # SENDING DATA/WRITING DATA TO SHEET [POST]
 ```gdscript
-var sheetname = "DATA" # name of sheet in which you want to add data
-#this is just example variables
-#date, time, cate, amount, desc = 12/11/22,08:15,INCOME,250,SOAP
-var datasend = "?date="+date+"&time="+time+"&cate="+cate+"&amount="+amount+"&desc="+desc+"&sheetname="+sheetname #LOOK into appscript's code doPost func to understand this 
-var headers = ["Content-Length: 0"]
-var posturl = apiurl+datasend
-$HTTPRequest.request(posturl,headers,true,HTTPClient.METHOD_POST)
+func make_http_post_request(endpoint: String, data: Dictionary) -> void:
+	var url = app_url + "?action=" + endpoint
+	#var json_data = JSON(data)
+	var json_data = JSON.new().stringify(data)
+	
+	var request = HTTPRequest.new()
+	add_child(request)
+	print(url, json_data)
+	request.connect("request_completed", _on_request_completed)
+	request.request(url,  ["Content-Type: application/json"], HTTPClient.METHOD_POST, json_data)
 ```
