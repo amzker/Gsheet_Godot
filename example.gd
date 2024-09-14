@@ -32,28 +32,6 @@ func make_http_post_request(endpoint: String, data: Dictionary) -> void:
 	request.connect("request_completed", _on_request_completed)
 	request.request(url,  ["Content-Type: application/json"], HTTPClient.METHOD_POST, json_data)
 
-# Fetch the list of notes (IDs and titles)
-func fetch_notes_list() -> void:
-	make_http_get_request("fetch_notes_list")
-
-# Fetch the text of a note by its ID
-func fetch_notes_text(id: int) -> void:
-	make_http_get_request("fetch_notes_content", {"id": id})
-
-# Save or update the note with the title and content
-func save_notes_texts() -> void:
-	var note_data = {
-		"title": title.text,
-		"text": note_text.text
-	}
-
-	make_http_post_request("create_new_note", note_data)
-	fetch_notes_list()
-	
-
-# Called when the save button is pressed
-func _on_save_button_pressed() -> void:
-	await save_notes_texts()
 
 # Handles the request completion
 func _on_request_completed(result, response_code, headers, body) -> void:
@@ -79,9 +57,63 @@ func _on_request_completed(result, response_code, headers, body) -> void:
 	else:
 		print("Error with response code: ", response_code, result, body.get_string_from_utf8())
 
+func save_note(method: String, id = null) -> void:
+	var note_data = {
+		"title": title.text,
+		"text": note_text.text
+	}
+	if id != null:
+		note_data["id"] = id
+	await make_http_post_request(method, note_data)
+
+func delete_note_by_id(id: int) -> void:
+	var note_data = {
+		"id": id
+	}
+	await make_http_post_request("delete_note", note_data)
+
+func get_selected_note_id():
+	var selected_items = note_list.get_selected_items()
+	if selected_items.size() > 0:
+		var item: String = note_list.get_item_text(selected_items[0])
+		var id = item.split(":")[0].strip_edges()
+		return int(id)
+	return null
+
+func get_selected_note_id_from_index(index: int) -> int:
+	var item: String = note_list.get_item_text(index)
+	var id = item.split(":")[0].strip_edges()
+	return int(id)
+
+func fetch_notes_list() -> void:
+	make_http_get_request("fetch_notes_list")
+
+func fetch_notes_text(id: int) -> void:
+	make_http_get_request("fetch_notes_content", {"id": id})
+
+
+func _on_save_button_pressed() -> void:
+	await save_note("create_new_note")
+	await fetch_notes_list()
+
+
+func _on_update_pressed() -> void:
+	var selected_id = get_selected_note_id()
+	if selected_id != null:
+		await save_note("save_existing_note", selected_id)
+		await fetch_notes_list()
+
+func _on_delete_pressed() -> void:
+	var selected_id = get_selected_note_id()
+	if selected_id != null:
+		await delete_note_by_id(selected_id)
+		await fetch_notes_list()
 
 func _on_note_list_item_selected(index: int) -> void:
-	var item: String = note_list.get_item_text(index)
-	var id = item.split(":",0)
-	print(id)
-	fetch_notes_text(int(id[0]))
+	var selected_id = get_selected_note_id_from_index(index)
+	if selected_id != null:
+		fetch_notes_text(selected_id)
+
+
+func _on_refresh_pressed() -> void:
+	fetch_notes_list()

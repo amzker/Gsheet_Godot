@@ -18,10 +18,10 @@ size_flags_vertical = 6
 metadata/_edit_use_anchors_ = true
 
 [node name="title" type="LineEdit" parent="."]
-offset_left = 79.0
-offset_top = 13.0
-offset_right = 490.0
-offset_bottom = 62.0
+offset_left = 178.0
+offset_top = 15.0
+offset_right = 589.0
+offset_bottom = 64.0
 size_flags_horizontal = 6
 size_flags_vertical = 6
 placeholder_text = "note title"
@@ -44,13 +44,33 @@ highlight_current_line = true
 metadata/_edit_use_anchors_ = true
 
 [node name="save_button" type="Button" parent="."]
-offset_left = 531.0
-offset_top = 15.0
-offset_right = 650.0
-offset_bottom = 64.0
+offset_left = 609.0
+offset_top = 13.0
+offset_right = 728.0
+offset_bottom = 62.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 text = "SAVE"
+metadata/_edit_use_anchors_ = true
+
+[node name="delete" type="Button" parent="."]
+offset_left = 761.0
+offset_top = 12.0
+offset_right = 880.0
+offset_bottom = 61.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "DELETE"
+metadata/_edit_use_anchors_ = true
+
+[node name="update" type="Button" parent="."]
+offset_left = 23.0
+offset_top = 19.0
+offset_right = 142.0
+offset_bottom = 68.0
+size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "UPDATE"
 metadata/_edit_use_anchors_ = true
 
 [node name="note_list" type="ItemList" parent="."]
@@ -71,5 +91,16 @@ metadata/_edit_use_anchors_ = true
 
 [node name="HTTPRequest" type="HTTPRequest" parent="."]
 
+[node name="REFRESH" type="Button" parent="."]
+offset_left = 1039.0
+offset_top = 9.0
+offset_right = 1115.0
+offset_bottom = 63.0
+text = "REFRESH"
+metadata/_edit_use_anchors_ = true
+
 [connection signal="pressed" from="save_button" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="delete" to="." method="_on_delete_pressed"]
+[connection signal="pressed" from="update" to="." method="_on_update_pressed"]
 [connection signal="item_selected" from="note_list" to="." method="_on_note_list_item_selected"]
+[connection signal="pressed" from="REFRESH" to="." method="_on_refresh_pressed"]
